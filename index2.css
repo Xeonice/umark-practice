@@ -1,0 +1,10 @@
+.logo-img {
+  margin-top: 5px;
+}
+.navbar-modify {
+  display: flex;
+  align-items: center;
+}
+.navbar-right li {
+  margin-right: 10px;
+}
