@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<title>Read Only by HTML5 UP</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="description" content="" />
+	<meta name="keywords" content="" />
+	<script src="js/jquery.min.js"></script>
+	<script src="js/jquery.scrollzer.min.js"></script>
+	<script src="js/jquery.scrolly.min.js"></script>
+	<script src="js/skel.min.js"></script>
+	<script src="js/skel-layers.min.js"></script>
+	<script src="js/init.js"></script>
+	<script src="./js/tinyImgUpload.js"></script>
+
+
+
+	<link rel="stylesheet" href="css/skel.css" />
+	<link rel="stylesheet" href="css/style.css" />
+	<link rel="stylesheet" href="css/style-xlarge.css" />
+	<link rel="stylesheet" href="./css//tinyImgUpload.css">
+</head>
+
+<body>
+	<!-- Main -->
+	<div id="main">
+		<!-- One -->
+		<section id="one">
+			<div class="container">
+				<header class="major">
+					<h2>XX 合同</h2>
+					<p>应用使用说明</p>
+				</header>
+				<p>Faucibus sed lobortis aliquam lorem blandit. Lorem eu nunc metus col. Commodo id in arcu ante lorem ipsum sed accumsan
+					erat praesent faucibus commodo ac mi lacus. Adipiscing mi ac commodo. Vis aliquet tortor ultricies non ante erat nunc
+					integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non. Adipiscing cubilia
+					elementum.
+				</p>
+			</div>
+		</section>
+
+		<!-- Three -->
+		<section id="three">
+			<div class="container">
+				<h3>合同识别</h3>
+				<div class="features" id="container">
+					<!-- 对控件进行循环，直至控件中的 title 数组为空为止 -->
+					<!-- 将实例中的各种数据引入控件，作为控件的参数 -->
+					<view-container 
+						v-for="post in titles"
+						v-bind:key="post.id"
+						v-bind:titlecontent="post.titlecontents"
+						v-bind:id="post.id"
+						v-bind:videoid="post.video"
+						v-bind:canvasid="post.canvas"
+						v-bind:submitid="post.submit"
+						v-bind:submitclickid="post.submitclick"
+					></view-container>
+				</div>
+			</div>
+		</section>
+
+	</div>
+	<!-- Vue 框架 -->
+	<script src="./js/vue.js"></script>
+	<!-- Vue 实例核心代码 -->
+	<script src="./js/vue-coding.js"></script>
+</body>
+
+</html>

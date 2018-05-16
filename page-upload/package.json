@@ -1,0 +1,14 @@
+{
+  "name": "page-upload",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "DouglasDong <ad546971975@gmail.com> (http://www.douglasdong.site/)",
+  "license": "MIT",
+  "dependencies": {
+    "vue-camera": "^1.0.2"
+  }
+}
