@@ -1,7 +1,8 @@
 /*
  *  to - do :
- *  书写 takephoto 方法中的 ajax 请求（base-64数组 -- imgData）
- *  书写 tinyImgUpload 方法中的 ajax 请求（base - 64 数组--base64_upload）
+ *  书写 takephoto 方法中的 ajax 请求（base-64数组 -- imgData） line-76
+ *  书写 tinyImgUpload 方法中的 ajax 请求（base - 64 数组--base64_upload） line-259
+ *  注：可在控制台中看到相应的 base-64 数据
  */ 
 
 //控件名：view-container
@@ -10,10 +11,11 @@ Vue.component('view-container', {
   data: function () {
     return {
       //初始页面状态为显示拍照控件，不显示上传控件
-      video: true,//切换 video 标签
+      init: true,//初始标签
+      video: false,//切换 video 标签
       submit: false,//切换 submit 标签
       videoReturnData: [],//回传数据，使用 this.videoReturnData 调用
-      submitReturnData: [],//回传数据，使用 submitReturnData 调用
+      submitReturnData: [],//回传数据，使用 this.submitReturnData 调用
     }
   },
   /*控件参数（由父控件传入）：
@@ -29,6 +31,7 @@ Vue.component('view-container', {
   methods: {
     paizhao: function (videoid, canvasid) {
       //控件切换（拍照）按钮点击后的事件
+      this.init = false;//切出 init 页面
       this.video = true;//将 video 置真，从而显示拍照控件
       this.submit = false;//将 submit 置假，隐藏上传控件
       //初始化 video 标签所需的数据
@@ -72,6 +75,7 @@ Vue.component('view-container', {
       //转换 canvas 中的图像数据为 base-64 数组
       var imgData = canvas.toDataURL("image/png");
       //请针对此数据（imgData）写一个ajax请求
+      console.log('base64-takePhoto');
       console.log(imgData);
     },
     
@@ -81,6 +85,7 @@ Vue.component('view-container', {
      *提交文件 按钮的 id 数据
      */
     submitchange: function (id,submitid,submitclickid) {
+      this.init = false;//切出 init 页面
       this.submit = true; //将 submit 置真，从而显示上传控件
       this.video = false; ////将 video 置假，从而隐藏拍照控件
       document.documentElement.style.fontSize = document.documentElement.clientWidth * 0.1 + 'px';
@@ -178,7 +183,7 @@ Vue.component('view-container', {
           if (!tip) {
             // 不重复，且为图片时
             ele.files.push(f);
-            console.log(f);
+            // console.log(f);
 
             var reader = new FileReader();
             // 图片文件绑定到容器元素上
@@ -197,7 +202,6 @@ Vue.component('view-container', {
                 document.querySelector(img_up_add, img_item).setAttribute('style','display: none');
                 // 将 base-64 数据赋值给全局变量 base64_upload
                 base64_upload = e.target.result;
-                console.log(base64_upload);
               };
             })(f);
 
@@ -211,7 +215,7 @@ Vue.component('view-container', {
       // 删除图片
       function removeImg(evt) {
         if (evt.target.className.match(/img-remove/)) {
-          console.log('3', ele.files);
+          // console.log('3', ele.files);
           // 获取删除的节点的索引
           function getIndex(ele) {
 
@@ -236,9 +240,8 @@ Vue.component('view-container', {
             // 删除 file 数组中的数据
             ele.files.splice(index, 1);
           }
-          console.log(ele);
           ele.setAttribute('display','block');
-          console.log('4', ele.files);
+          // console.log('4', ele.files);
           //删除后，显示被隐藏的上传控件
           document.querySelector(img_up_add, img_item).setAttribute('style','display: table');
         }
@@ -247,15 +250,14 @@ Vue.component('view-container', {
       ele.addEventListener('click', removeImg, false);
 
       // 上传图片
-      function uploadImg() {
-        console.log(ele.files);
-        
+      function uploadImg() {        
         // xhr 请求
         var xhr = new XMLHttpRequest();
         var formData = new FormData();
 
         //回传 base-64 数组（由原有的 ele.files 改写而来）
         //请在此基础上书写 Ajax 请求
+        console.log('base64-upload');
         console.log(base64_upload);
 
         
@@ -263,8 +265,8 @@ Vue.component('view-container', {
           formData.append('files', f);
         }
 
-        console.log('1', ele.files);
-        console.log('2', formData);
+        // console.log('1', ele.files);
+        // console.log('2', formData);
 
         xhr.onreadystatechange = function (e) {
           if (xhr.readyState == 4) {
@@ -287,21 +289,25 @@ Vue.component('view-container', {
       })
     }
   },
+  //HTML 模板文件
   template: `
   <article style="display: flex; justify-content: space-between; height: 800px; align-items: center;">
     <div class = "image">
       <div v-show = "submit==true" style = "display: flex;flex-direction: column; justify-content: center; align-items: center;" >
         <div :id="submitid" ></div>
-        <button :id="submitclickid"> 提交文件 </button>
+        <button :id="submitclickid" class="button alt small fit" style="margin-top: 30px"> 提交文件 </button>
       </div>
-      <div v-show = "video==true" >
-        <video :id="videoid" autoplay = " " > </video>
-        <button :id="id" v-on:click = "takephoto(id,canvasid,videoid)"> 拍照 </button> 
-        <canvas :id="canvasid" width = "267" height = "180" > </canvas>
+      <div v-show = "video==true" style="display: flex; flex-direction: column; justify-content: center; align-items: center">
+        <video :id="videoid" autoplay = " " style="margin-bottom: 10px;"> </video>
+        <canvas :id="canvasid" width = "267" height = "180" style="margin-bottom: 10px;"> </canvas>
+        <button :id = "id" v-on:click = "takephoto(id,canvasid,videoid)" class="button alt small fit"> 拍照 </button>
       </div>
-      <div style="display: flex; width: 100%; justify-content: center; margin-top:20px;">
-        <button v-on:click = "submitchange(id,submitid,submitclickid)"> 上传 </button>
-        <button v-on:click = "paizhao(videoid,canvasid)"> 拍照 </button>
+      <div v-show = "init==true">
+        <h2 style="text-align: center">请选择您的上传方式</h2>
+      </div>
+      <div style="display: flex; width: 100%; justify-content: space-around; margin-top:20px;">
+        <button v-on:click = "submitchange(id,submitid,submitclickid)" class="button small"> 上传 </button>
+        <button v-on:click = "paizhao(videoid,canvasid)" class="button special small"> 拍照 </button>
       </div>
     </div>
     <div class = "inner" style="display: flex; align-item: center; flex-direction: column">
