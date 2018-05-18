@@ -28,7 +28,6 @@
 .img-item-submit1, .img-item-submit2,.img-item-submit3{
     position: relative;
     float: left;
-    margin-bottom: 100px;
     height: 200px;
     width: 200px;
 }
@@ -65,5 +64,8 @@
     background-clip: padding-box;
 }
 #img-file-input-submit1, #img-file-input-submit2, #img-file-input-submit3 {
+    display: none;
+}
+.hideBtn {
     display: none;
 }

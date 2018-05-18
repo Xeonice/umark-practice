@@ -26,7 +26,7 @@ Vue.component('view-container', {
   * submitid：用于区分上传控件中的 上传 控件
   * submitclickid：用于区分上传控件中的 提交文件 按钮
   */
-  props: ['titlecontent', 'id', 'videoid', 'canvasid', 'submitid', 'submitclickid'],
+  props: ['titlecontent', 'id', 'videoid', 'canvasid', 'submitid', 'submitclickid', 'pagetitle'],
   //控件方法
   methods: {
     paizhao: function (videoid, canvasid) {
@@ -42,11 +42,15 @@ Vue.component('view-container', {
           height: 180//高度为 180px（可自定义）
         }
       };
+
       //选取控件中的 canvas 标签，清除 canvas 标签上次调用时所留下来的图像数据
       var cxt = document.getElementById(canvasid).getContext("2d");
+      var canvas = document.getElementById(canvasid);
+      canvas.setAttribute('style', 'display: none');
       cxt.clearRect(0, 0, 267, 180);
       //选取控件中的 video 标签
       var video = document.getElementById(videoid);
+      video.setAttribute('style', 'display: block');
       //请求用户摄像头
       navigator.mediaDevices.getUserMedia(constraints)
         //成功时获取视频流（mediaStream）
@@ -70,6 +74,8 @@ Vue.component('view-container', {
       var canvas = document.getElementById(canvasid);
       //获取指定 canvas 标签中的 2d 数据
       var context = canvas.getContext("2d");
+      video.setAttribute('style', 'display: none');
+      canvas.setAttribute('style', 'display: block');
       //将 video 标签中视频流当前画面进行截取，并绘制于 canvas 标签上
       context.drawImage(video, 0, 0, 267, 180);
       //转换 canvas 中的图像数据为 base-64 数组
@@ -151,6 +157,8 @@ Vue.component('view-container', {
       img_add_icon = '.' + img_add_icon;
       img_file_input = '#' + img_file_input;
 
+      console.log(submitclickid);
+
       // 为添加按钮绑定点击事件，设置选择图片的功能
       var addBtn = document.querySelector(img_up_add);
       addBtn.addEventListener('click', function () {
@@ -159,8 +167,9 @@ Vue.component('view-container', {
         document.querySelector(img_file_input).click();
         return false;
       }, false)
+      addBtn.click();
 
-
+      var submitBtn = document.getElementById(submitclickid);
 
       // 预览图片
       //处理input选择的图片
@@ -193,15 +202,15 @@ Vue.component('view-container', {
                 var oDiv = document.createElement('div');
                 oDiv.className = 'img-thumb img-item';
                 // 向图片容器里添加元素，src 设置为 base-64 数组
-                oDiv.innerHTML = '<img class="thumb-icon" src="' + e.target.result + '" />' +
-                  '<a href="javscript:;" class="img-remove">x</a>'
-                ;
+                oDiv.innerHTML = 
+                `<img class="thumb-icon" src="${e.target.result}" style="height: 282px; width: 200px;"/>`
                 // 添加在上传控件之前
                 ele.insertBefore(oDiv, addBtn);
                 // 添加完毕后隐藏上传控件
                 document.querySelector(img_up_add, img_item).setAttribute('style','display: none');
                 // 将 base-64 数据赋值给全局变量 base64_upload
                 base64_upload = e.target.result;
+                uploadImg();
               };
             })(f);
 
@@ -211,43 +220,6 @@ Vue.component('view-container', {
       }
       // input 改变时（ + 按钮点选并修改后）调用 handleFileSelect
       document.querySelector(img_file_input).addEventListener('change', handleFileSelect, false);
-
-      // 删除图片
-      function removeImg(evt) {
-        if (evt.target.className.match(/img-remove/)) {
-          // console.log('3', ele.files);
-          // 获取删除的节点的索引
-          function getIndex(ele) {
-
-            if (ele && ele.nodeType && ele.nodeType == 1) {
-              var oParent = ele.parentNode;
-              var oChilds = oParent.children;
-              for (var i = 0; i < oChilds.length; i++) {
-                if (oChilds[i] == ele)
-                  return i;
-              }
-            } else {
-              return -1;
-            }
-          }
-          // 根据索引删除指定的文件对象
-          var index = getIndex(evt.target.parentNode);
-          // 删除预览图容器
-          ele.removeChild(evt.target.parentNode);
-          if (index < 0) {
-            return;
-          } else {
-            // 删除 file 数组中的数据
-            ele.files.splice(index, 1);
-          }
-          ele.setAttribute('display','block');
-          // console.log('4', ele.files);
-          //删除后，显示被隐藏的上传控件
-          document.querySelector(img_up_add, img_item).setAttribute('style','display: table');
-        }
-      }
-      // 点击时，调用 removeImg 方法
-      ele.addEventListener('click', removeImg, false);
 
       // 上传图片
       function uploadImg() {        
@@ -276,42 +248,36 @@ Vue.component('view-container', {
               options.onFailure(xhr.responseText);
             }
           }
+
+          xhr.open('POST', options.path, true);
+          xhr.send(formData);
         }
-
-        xhr.open('POST', options.path, true);
-        xhr.send(formData);
       }
-
-      //点击 上传文件 按钮时，触发 uploadImg 方法
-      var submitBtn = document.getElementById(submitclickid);
-      submitBtn.addEventListener('click', function () {
-        uploadImg();
-      })
     }
   },
   //HTML 模板文件
   template: `
-  <article style="display: flex; justify-content: space-between; height: 800px; align-items: center;">
+  <article style="display: flex; justify-content: space-between; height: 500px; align-items: center;">
     <div class = "image">
+      <div v-show = "init==true">
+        <img src = "images/test.png">
+      </div>
       <div v-show = "submit==true" style = "display: flex;flex-direction: column; justify-content: center; align-items: center;" >
         <div :id="submitid" ></div>
-        <button :id="submitclickid" class="button alt small fit" style="margin-top: 30px"> 提交文件 </button>
       </div>
       <div v-show = "video==true" style="display: flex; flex-direction: column; justify-content: center; align-items: center">
         <video :id="videoid" autoplay = " " style="margin-bottom: 10px;"> </video>
         <canvas :id="canvasid" width = "267" height = "180" style="margin-bottom: 10px;"> </canvas>
-        <button :id = "id" v-on:click = "takephoto(id,canvasid,videoid)" class="button alt small fit"> 拍照 </button>
+        <button :id = "id" v-on:click = "takephoto(id,canvasid,videoid)" class="button alt small fit" style="margin-top: 40px;"> 拍照 </button>
       </div>
-      <div v-show = "init==true">
-        <h2 style="text-align: center">请选择您的上传方式</h2>
-      </div>
+
       <div style="display: flex; width: 100%; justify-content: space-around; margin-top:20px;">
         <button v-on:click = "submitchange(id,submitid,submitclickid)" class="button small"> 上传 </button>
         <button v-on:click = "paizhao(videoid,canvasid)" class="button special small"> 拍照 </button>
       </div>
     </div>
     <div class = "inner" style="display: flex; align-item: center; flex-direction: column">
-      <h4>{{id}}</h4>
+      <h2>{{pagetitle}}</h2>
       <p v-for="title in titlecontent">{{title}}</p>
     </div>
   </article>
@@ -325,6 +291,7 @@ var app = new Vue({
   data: {
     titles: [{
         id: 1,
+        page: '第一页',
         titlecontents: ['项目名称：', '委托方（甲方）：', '委托方（乙方）：', '签订时间：', '签订地点：'],
         video: 'video1',
         canvas: 'canvas1',
@@ -333,6 +300,7 @@ var app = new Vue({
       },
       {
         id: 2,
+        page: '第二页',
         titlecontents: ['委托方（甲方）：', '住所地：', '法定代表人：', '联系方式：', '电子信息：'],
         video: 'video2',
         canvas: 'canvas2',
@@ -341,6 +309,7 @@ var app = new Vue({
       },
       {
         id: 3,
+        page: '第三页',
         titlecontents: ['合同总金额：', '开户银行：', '地址：', '账号：'],
         video: 'video3',
         canvas: 'canvas3',

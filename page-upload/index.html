@@ -29,13 +29,15 @@
 		<section id="one">
 			<div class="container">
 				<header class="major">
-					<h2>XX 合同</h2>
-					<p>应用使用说明</p>
+					<h2>合同一</h2>
+					<p>系统使用说明</p>
 				</header>
-				<p>Faucibus sed lobortis aliquam lorem blandit. Lorem eu nunc metus col. Commodo id in arcu ante lorem ipsum sed accumsan
-					erat praesent faucibus commodo ac mi lacus. Adipiscing mi ac commodo. Vis aliquet tortor ultricies non ante erat nunc
-					integer eu ante ornare amet commetus vestibulum blandit integer in curae ac faucibus integer non. Adipiscing cubilia
-					elementum.
+				<p>
+					请上传（拍摄或选择）合同当页照片
+					<br> 1、所拍摄或选择的照片应当端正且清晰，扭曲或者模糊的照片会降低识别准确度；
+					<br> 2、所拍摄或选择的照片应完整包含合同当前页面（A4纸张），切不可只拍摄页面的某一部分内容；
+					<br> 3、所拍摄或选择的合同照片页码应和顶部提示页码一致，否则会造成是被失败；
+					<br> 4、若识别失败或返回结果错误，请根据提示进行操作，或重新拍摄或选择照片。
 				</p>
 			</div>
 		</section>
@@ -47,16 +49,9 @@
 				<div class="features" id="container">
 					<!-- 对控件进行循环，直至控件中的 title 数组为空为止 -->
 					<!-- 将实例中的各种数据引入控件，作为控件的参数 -->
-					<view-container 
-						v-for="post in titles"
-						v-bind:key="post.id"
-						v-bind:titlecontent="post.titlecontents"
-						v-bind:id="post.id"
-						v-bind:videoid="post.video"
-						v-bind:canvasid="post.canvas"
-						v-bind:submitid="post.submit"
-						v-bind:submitclickid="post.submitclick"
-					></view-container>
+					<view-container v-for="post in titles" v-bind:key="post.id" v-bind:titlecontent="post.titlecontents" v-bind:id="post.id"
+						v-bind:videoid="post.video" v-bind:canvasid="post.canvas" v-bind:submitid="post.submit" v-bind:submitclickid="post.submitclick" v-bind:pagetitle="post.page"
+						></view-container>
 				</div>
 			</div>
 		</section>
