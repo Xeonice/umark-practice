@@ -141,7 +141,7 @@ Vue.component('view-container', {
         eleList[0].innerHTML =
         `<div id="${img_container}" >
           <div class="${img_up_add}  ${img_item}"> 
-            <span class="${img_add_icon}">+</span> 
+            <img src = "images/test.png" alt = "test" class = "${img_add_icon}" >
           </div>
           <input type="file" name="files" id="${img_file_input}" multiple>
         </div>`;
@@ -262,13 +262,13 @@ Vue.component('view-container', {
       <div v-show = "init==true">
         <img src = "images/test.png">
       </div>
-      <div v-show = "submit==true" style = "display: flex;flex-direction: column; justify-content: center; align-items: center;" >
+      <div v-show = "submit==true" style = "display: flex;flex-direction: column; justify-content: center; align-items: center; width: 100%; height: 100%" >
         <div :id="submitid" ></div>
       </div>
       <div v-show = "video==true" style="display: flex; flex-direction: column; justify-content: center; align-items: center">
         <video :id="videoid" autoplay = " " style="margin-bottom: 10px;"> </video>
         <canvas :id="canvasid" width = "267" height = "180" style="margin-bottom: 10px;"> </canvas>
-        <button :id = "id" v-on:click = "takephoto(id,canvasid,videoid)" class="button alt small fit" style="margin-top: 40px;"> 拍照 </button>
+        <button :id = "id" v-on:click = "takephoto(id,canvasid,videoid)" class="button alt small fit" style="margin-top: 40px; width: 120px"> 确认 </button>
       </div>
 
       <div style="display: flex; width: 100%; justify-content: space-around; margin-top:20px;">

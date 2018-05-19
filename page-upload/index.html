@@ -23,11 +23,47 @@
 </head>
 
 <body>
+
 	<!-- Main -->
 	<div id="main">
 		<!-- One -->
+		<div id="top" style="  
+			background:#fff; 
+			border-bottom: 1px solid #d1d4d7;
+			box-shadow: 0 0 5px rgba(0,0,0,.1);
+			position: fixed;
+			width: 100%;
+			z-index: 100;
+			left:0;
+			right:0;
+			padding-top: 10px;
+			padding-bottom: 10px;
+			*zoom: 1;">
+			<nav style="
+				width: 100%; 
+				max-width: 1002px; 
+				margin: 0 auto; 
+				height: 36px; 
+				padding: 0 0 22px 0;
+			">
+				<div class="logo clearfix" style="
+					display: flex; 
+					align-items: center;
+					margin-left: 8.38%;
+					float: left;">
+					<a href="#home" style="
+						width: 56px;
+						height: 56px;
+						background: url(images/logo.png);
+						background-size: 56px 56px;
+						display: block;">
+					</a>
+					<h2 style="font-size: 20px; padding-left: 24px; font-weight: bold; margin: 0">优码客 OCR 智能文字识别系统</h2>
+				</div>
+			</nav>
+		</div>
 		<section id="one">
-			<div class="container">
+			<div class="container" style="padding-top: 200px">
 				<header class="major">
 					<h2>合同一</h2>
 					<p>系统使用说明</p>
@@ -50,8 +86,8 @@
 					<!-- 对控件进行循环，直至控件中的 title 数组为空为止 -->
 					<!-- 将实例中的各种数据引入控件，作为控件的参数 -->
 					<view-container v-for="post in titles" v-bind:key="post.id" v-bind:titlecontent="post.titlecontents" v-bind:id="post.id"
-						v-bind:videoid="post.video" v-bind:canvasid="post.canvas" v-bind:submitid="post.submit" v-bind:submitclickid="post.submitclick" v-bind:pagetitle="post.page"
-						></view-container>
+					  v-bind:videoid="post.video" v-bind:canvasid="post.canvas" v-bind:submitid="post.submit" v-bind:submitclickid="post.submitclick"
+					  v-bind:pagetitle="post.page"></view-container>
 				</div>
 			</div>
 		</section>

@@ -28,8 +28,6 @@
 .img-item-submit1, .img-item-submit2,.img-item-submit3{
     position: relative;
     float: left;
-    height: 200px;
-    width: 200px;
 }
 .img-thumb {
     border: 1px solid #000;
@@ -39,11 +37,11 @@
     height: 100%;
 }
 .img-up-add-submit1, .img-up-add-submit2, .img-up-add-submit3 {
-    display: table;
-    border: 1px dashed #E0E0E0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .img-add-icon-submit1, .img-add-icon-submit2, .img-add-icon-submit3 {
-    display: table-cell;
     vertical-align: middle;
     text-align: center;
 }
