@@ -1,9 +1,3 @@
-/*
- *  to - do :
- *  书写 takephoto 方法中的 ajax 请求（base-64数组 -- imgData） line-76
- *  书写 tinyImgUpload 方法中的 ajax 请求（base - 64 数组--base64_upload） line-259
- *  注：可在控制台中看到相应的 base-64 数据
- */ 
 
 //控件名：view-container
 Vue.component('view-container', {
@@ -14,8 +8,9 @@ Vue.component('view-container', {
       init: true,//初始标签
       video: false,//切换 video 标签
       submit: false,//切换 submit 标签
-      videoReturnData: [],//回传数据，使用 this.videoReturnData 调用
-      submitReturnData: [],//回传数据，使用 this.submitReturnData 调用
+      data: this.titlecontent,
+      initdata: this.titlecontentinit,
+      error: '',
     }
   },
   /*控件参数（由父控件传入）：
@@ -25,8 +20,10 @@ Vue.component('view-container', {
   * canvasid：用于区分拍照控件中的 canvas 标签
   * submitid：用于区分上传控件中的 上传 控件
   * submitclickid：用于区分上传控件中的 提交文件 按钮
+  * 合同页标题
+  * 合同页内容
   */
-  props: ['titlecontent', 'id', 'videoid', 'canvasid', 'submitid', 'submitclickid', 'pagetitle'],
+  props: ['titlecontent', 'id', 'videoid', 'canvasid', 'submitid', 'submitclickid', 'pagetitle', 'titlecontentinit'],
   //控件方法
   methods: {
     paizhao: function (videoid, canvasid) {
@@ -54,18 +51,18 @@ Vue.component('view-container', {
       //请求用户摄像头
       navigator.mediaDevices.getUserMedia(constraints)
         //成功时获取视频流（mediaStream）
-        .then(function (mediaStream) {
-          //切换 video 标签的 src 源为用户视频流（mediaStream）
-          video.srcObject = mediaStream;
-          //video 标签加载完毕时自动进行播放
-          video.onloadedmetadata = function (e) {
-            video.play();
-          };
-        })
-        //失败时输出错误信息
-        .catch(function (err) {
-          console.log(err.name + ": " + err.message);
-        });
+      .then(function (mediaStream) {
+        //切换 video 标签的 src 源为用户视频流（mediaStream）
+        video.srcObject = mediaStream;
+        //video 标签加载完毕时自动进行播放
+        video.onloadedmetadata = function (e) {
+          video.play();
+        };
+      })
+      //失败时输出错误信息
+      .catch(function (err) {
+        console.log(err.name + ": " + err.message);
+      });
     },
     takephoto: function (id, canvasid, videoid) {
       //选取控件中的 video 标签
@@ -80,9 +77,58 @@ Vue.component('view-container', {
       context.drawImage(video, 0, 0, 267, 180);
       //转换 canvas 中的图像数据为 base-64 数组
       var imgData = canvas.toDataURL("image/png");
+
       //请针对此数据（imgData）写一个ajax请求
       console.log('base64-takePhoto');
       console.log(imgData);
+      function convertBase64UrlToBlob(urlData) {
+        // base-64转图片
+        var bytes = window.atob(urlData.split(',')[1]);        //去掉url的头，并转换为byte
+        //处理异常,将ascii码小于0的转换为大于0  
+        var ab = new ArrayBuffer(bytes.length);
+        var ia = new Uint8Array(ab);
+        for (var i = 0; i < bytes.length; i++) {
+          ia[i] = bytes.charCodeAt(i);
+        }
+
+        return new Blob([ab], { type: 'image/png' });
+      }
+      var formData = new FormData(); 
+      //convertBase64UrlToBlob函数是将base64编码转换为Blob  
+      formData.append("file", convertBase64UrlToBlob(imgData)); //append函数的第一个参数是后台获取数据的参数名,和html标签的input的name属性功能相同
+      formData.append("userId", id);
+      //初始化上传数据
+      var settings = {
+        "url": "http://47.93.252.219:9081/api/contract/fileUpload",
+        "method": "POST",
+        "contentType": false,//禁用 jquery 的默认编译选项
+        'processData': false,
+        "data": formData
+      }
+
+      $.ajax(settings).done(function (response) {
+        console.log(response);
+        if (id === 2) {
+          id = 3;//原有的第二页被消去了
+        }
+        var path = {
+          conImagePath: response.data.filePath,
+          conImagePageNum: id,
+        }
+        var returnData = {
+          "url": "http://47.93.252.219:9081/api/contract/verifyContractContent",
+          "method": "POST",
+          "data": path,
+        }
+        $.ajax(returnData).done(function (response) {
+          if (response.errorCode === 0) {
+            console.log(response.msg);
+          }
+          else {
+            console.log(response.data);
+          }
+        })
+      });
     },
     
     /*接收:
@@ -90,23 +136,14 @@ Vue.component('view-container', {
      *上传控件 id，
      *提交文件 按钮的 id 数据
      */
-    submitchange: function (id,submitid,submitclickid) {
+    submitchange: function (id, data,submitid,submitclickid) {
       this.init = false;//切出 init 页面
       this.submit = true; //将 submit 置真，从而显示上传控件
       this.video = false; ////将 video 置假，从而隐藏拍照控件
+      console.log("initData", this.initdata);
+      console.log(this.data);
+      
       document.documentElement.style.fontSize = document.documentElement.clientWidth * 0.1 + 'px';
-      //初始化将要传入上传函数中的配置参数
-      var options = {
-        path: '/',//上传URL
-        onSuccess: function (res) {
-          //成功时的方法
-          console.log(res);
-        },
-        onFailure: function (res) {
-          //失败时的方法
-          console.log(res);
-        }
-      }
       /*
       * 参数：
       * 合同页数
@@ -114,10 +151,13 @@ Vue.component('view-container', {
       * 上传文件按钮 id
       * 配置参数
       */
-      this.tinyImgUpload(id, submitid, submitclickid, options);
+      this.tinyImgUpload(id, data, submitid, submitclickid);
     },
 
-    tinyImgUpload: function (id, ele, submitclickid, options) {
+    tinyImgUpload: function (id, data, ele, submitclickid) {
+      var title = this.data;
+      var init = this.initdata;
+      console.log(title);
       // 判断容器元素合理性并且添加基础元素
       var img_container = 'img-container-' + ele;//容器
       var img_up_add = 'img-up-add-' + ele;// + 按钮
@@ -139,11 +179,11 @@ Vue.component('view-container', {
         // 测试通过时
         // 向上传控件（id=submit）中添加 html 内容（模板字符串）
         eleList[0].innerHTML =
-        `<div id="${img_container}" >
+        `<div id="${img_container}">
           <div class="${img_up_add}  ${img_item}"> 
             <img src = "images/test.png" alt = "test" class = "${img_add_icon}" >
           </div>
-          <input type="file" name="files" id="${img_file_input}" multiple>
+          <input id = "${img_file_input}" type = "file" multiple name = "file" data-overwrite-initial = "false" data-min-file-count = "1" >
         </div>`;
         // 选取出 #img-container 中的元素
         img_container = '#' + img_container;
@@ -167,6 +207,7 @@ Vue.component('view-container', {
         document.querySelector(img_file_input).click();
         return false;
       }, false)
+      //已将所有内容连成事件链，无需考虑此处代码
       addBtn.click();
 
       var submitBtn = document.getElementById(submitclickid);
@@ -223,35 +264,49 @@ Vue.component('view-container', {
 
       // 上传图片
       function uploadImg() {        
-        // xhr 请求
-        var xhr = new XMLHttpRequest();
-        var formData = new FormData();
+        var form = new FormData();
+        form.append('file', ele.files[0]);
+        form.append("userId", id);
+        form.get('file');
 
-        //回传 base-64 数组（由原有的 ele.files 改写而来）
-        //请在此基础上书写 Ajax 请求
-        console.log('base64-upload');
-        console.log(base64_upload);
-
-        
-        for (var i = 0, f; f = ele.files[i]; i++) {
-          formData.append('files', f);
+        var settings = {
+          "url": "http://47.93.252.219:9081/api/contract/fileUpload",
+          "method": "POST",
+          "contentType": false,//禁用 jquery 的默认编译选项
+          'processData': false,
+          "data": form
         }
 
-        // console.log('1', ele.files);
-        // console.log('2', formData);
-
-        xhr.onreadystatechange = function (e) {
-          if (xhr.readyState == 4) {
-            if (xhr.status == 200) {
-              options.onSuccess(xhr.responseText);
-            } else {
-              options.onFailure(xhr.responseText);
-            }
+        $.ajax(settings).done(function (response) {
+          if (id === 2) {
+            id = 3;//消失的第二页
           }
+          else if (id === 3) {
+            id = 4;//消失的第二页
+          }
+          console.log('id', id);
+          var path = {
+            conImagePath: response.data.filePath,
+            conImagePageNum: id,//第二页消失了
+          }
+          var returnData = {
+            "url": "http://47.93.252.219:9081/api/contract/verifyContractContent",
+            "method": "POST",
+            "data": path,
+          }
+          $.ajax(returnData).done(function (response) {
+            if (response.errorCode === 0) {
+              console.log(response.msg);
+            }
+            else {
 
-          xhr.open('POST', options.path, true);
-          xhr.send(formData);
-        }
+              Object.keys(response.data).forEach(function (key, index) {
+                title.splice(index, 1, title[index] + response.data[key])
+              });
+            }
+          })
+          console.log(response.data.filePath);
+        });
       }
     }
   },
@@ -272,13 +327,15 @@ Vue.component('view-container', {
       </div>
 
       <div style="display: flex; width: 100%; justify-content: space-around; margin-top:20px;">
-        <button v-on:click = "submitchange(id,submitid,submitclickid)" class="button small"> 上传 </button>
+        <button v-on:click = "submitchange(id,data,submitid,submitclickid)" class="button small"> 上传 </button>
         <button v-on:click = "paizhao(videoid,canvasid)" class="button special small"> 拍照 </button>
       </div>
     </div>
     <div class = "inner" style="display: flex; align-item: center; flex-direction: column">
       <h2>{{pagetitle}}</h2>
-      <p v-for="title in titlecontent">{{title}}</p>
+      <div>
+        <p v-for="title in data">{{title}}</p>
+      </div>
     </div>
   </article>
   `,
@@ -292,7 +349,8 @@ var app = new Vue({
     titles: [{
         id: 1,
         page: '第一页',
-        titlecontents: ['项目名称：', '委托方（甲方）：', '委托方（乙方）：', '签订时间：', '签订地点：'],
+        titlecontentsinits: ['项目名称：', '委托方（甲方）：', '委托方（乙方）：', '签订时间：', '签订地点：', '有效期限'],
+        titlecontents: ['项目名称：', '委托方（甲方）：', '委托方（乙方）：', '签订时间：', '签订地点：', '有效期限'],
         video: 'video1',
         canvas: 'canvas1',
         submit: 'submit1',
@@ -301,7 +359,8 @@ var app = new Vue({
       {
         id: 2,
         page: '第二页',
-        titlecontents: ['委托方（甲方）：', '住所地：', '法定代表人：', '联系方式：', '电子信息：'],
+        titlecontentsinits: ['项目名称：', '委托方（甲方）：', '委托方（乙方）：', '签订时间：', '签订地点：', '有效期限'],
+        titlecontents: ['法定代表人：','委托方（甲方）：','联系方式：','电子信箱：','住所地：'],
         video: 'video2',
         canvas: 'canvas2',
         submit: 'submit2',
@@ -310,7 +369,8 @@ var app = new Vue({
       {
         id: 3,
         page: '第三页',
-        titlecontents: ['合同总金额：', '开户银行：', '地址：', '账号：'],
+        titlecontentsinits: ['项目名称：', '委托方（甲方）：', '委托方（乙方）：', '签订时间：', '签订地点：', '有效期限'],
+        titlecontents: ['账号：', '开户银行：', '合同总金额：', '地址：'],
         video: 'video3',
         canvas: 'canvas3',
         submit: 'submit3',

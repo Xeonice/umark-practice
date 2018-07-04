@@ -3,7 +3,7 @@
 
 <head>
 	<title>Read Only by HTML5 UP</title>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Type" content="multipart/form-data; charset=utf-8" />
 	<meta name="description" content="" />
 	<meta name="keywords" content="" />
 	<script src="js/jquery.min.js"></script>
@@ -12,9 +12,6 @@
 	<script src="js/skel.min.js"></script>
 	<script src="js/skel-layers.min.js"></script>
 	<script src="js/init.js"></script>
-	<script src="./js/tinyImgUpload.js"></script>
-
-
 
 	<link rel="stylesheet" href="css/skel.css" />
 	<link rel="stylesheet" href="css/style.css" />
@@ -87,7 +84,7 @@
 					<!-- 将实例中的各种数据引入控件，作为控件的参数 -->
 					<view-container v-for="post in titles" v-bind:key="post.id" v-bind:titlecontent="post.titlecontents" v-bind:id="post.id"
 					  v-bind:videoid="post.video" v-bind:canvasid="post.canvas" v-bind:submitid="post.submit" v-bind:submitclickid="post.submitclick"
-					  v-bind:pagetitle="post.page"></view-container>
+					  v-bind:pagetitle="post.page" v-bind:titlecontentinit="post.titlecontentsinits"></view-container>
 				</div>
 			</div>
 		</section>
